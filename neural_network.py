@@ -35,5 +35,33 @@ class Net(nn.Module):
         return num_features
 
 
-net = Net()
-print(net)
+if __name__ == "__main__":
+    net = Net()
+    print(net)
+
+    params = list(net.parameters())
+    print(len(params))
+    print(params[0].size())
+
+    input = torch.randn(1, 1, 32, 32)
+    out = net(input)
+    print(out)
+
+    net.zero_grad()
+    out.backward(torch.randn(1, 10))
+
+    target = torch.randn(10)  # a dummy target, for example
+    target = target.view(1, -1)  # make it the same shape as output
+    criterion = nn.MSELoss()
+
+    import torch.optim as optim
+
+    # create your optimizer
+    optimizer = optim.SGD(net.parameters(), lr=0.01)
+
+    # in your training loop:
+    optimizer.zero_grad()  # zero the gradient buffers
+    output = net(input)
+    loss = criterion(output, target)
+    loss.backward()
+    optimizer.step()  # Does the update
